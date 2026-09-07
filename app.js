@@ -6,8 +6,23 @@ const port = process.env.MIPUERTO || 3003;
 const sistemaArchivo = require("fs")
 const ruta = require("path")
 const rutaMiArchivo = ruta.join(__dirname,"datos.json")
-//middlewarc body-parse
-app.use(express.json())
+
+
+//importar multer
+const multer =require ("multer")
+//Almacenamiento
+const almacen = multer.diskStorage({
+    destination:(req,file,cb )=> {
+        cb(null,"misImagenes/")
+    },
+    filename : (rey,file,cb )=>{ 
+        const extension = ruta.extname(file.originalname)
+        cb(null,`${Date.now()}${extension}`)
+    }  /*cb= call back */
+})
+
+const subir = multer ({storage : almacen})
+
 //middlewarc formateo body
 app.use(express.json())
 app.use(express.urlencoded({extended :true}))
@@ -26,8 +41,10 @@ app.get('/api/aprendices', (req, res) => {
 });
 
 
-app.post('/api/aprendices', (req, res) => {
+app.post('/api/aprendices', subir.single("imagen"),(req, res) => {
   const datosAprendiz = req.body
+  datosAprendiz.imagen = req.file?`/misImagenes/${req.file.filename}`:"Sin Imagen"
+
  sistemaArchivo.readFile(rutaMiArchivo, "utf-8", (error, Datos)=>{
     if (error) res.status(500).json({error : "No se puede leer el archivo"})
     const listaAprendices = JSON.parse (Datos)

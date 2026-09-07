@@ -8,25 +8,31 @@
   },
   null,
   {
-    "nombre": "Mariana",
-    "edad": 17,
-    "correo": "marianota@gmail.com",
-    "imagen": "url",
-    "clave": "45678"
+    "nombre": "Dayana",
+    "edad": "25",
+    "correo": "dayanota@gmail.com",
+    "clave": "78952",
+    "imagen": "/misImagenes/1788798088295.jpg"
   },
   {
-    "nombre": "Marianaa",
-    "edad": 18,
-    "correo": "marianotajaja@gmail.com",
-    "imagen": "url",
-    "clave": "4567888"
+    "nombre": "Allison",
+    "edad": "16",
+    "correo": "alli@gmail.com",
+    "clave": "96475",
+    "imagen": "/misImagenes/1788798251827.jpg"
   },
-  null,
   {
-    "nombre": "Mariana",
-    "edad": "18",
-    "correo": "marianotajaja@gmail.com",
-    "imagen": "url",
-    "clave": "4567888"
+    "nombre": "Marianaaaaaa",
+    "edad": "40",
+    "correo": "maric@gmail.com",
+    "clave": "26495",
+    "imagen": "/misImagenes/1788798315882.jpg"
+  },
+  {
+    "nombre": "Ana",
+    "edad": "95",
+    "correo": "anaconda@gmail.com",
+    "clave": "36945",
+    "imagen": "/misImagenes/1788798689249.jpg"
   }
 ]
