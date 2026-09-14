@@ -34,5 +34,13 @@
     "correo": "anaconda@gmail.com",
     "clave": "36945",
     "imagen": "/misImagenes/1788798689249.jpg"
+  },
+  {
+    "id": 1,
+    "nombre": "MAriana",
+    "edad": "12",
+    "correo": "marianitis@gmail.com",
+    "clave": "12345",
+    "imagen": "/misImagenes/1789393360108.jpg"
   }
 ]

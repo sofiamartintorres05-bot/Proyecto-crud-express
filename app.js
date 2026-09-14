@@ -1,7 +1,13 @@
 const { error } = require('console');
 const express = require('express');
 const app = express();
-const port = process.env.MIPUERTO || 3003; 
+const port = process.env.MIPUERTO || 3003
+
+//Importar mis Middleware
+
+const registroMiddleware = require("./middleware/registroMiddleware")
+const manejadorErrores = require("./middleware/manejadorErrores")
+
 //libreria fs.path
 const sistemaArchivo = require("fs")
 const ruta = require("path")
@@ -11,7 +17,9 @@ const rutaMiArchivo = ruta.join(__dirname,"datos.json")
 const { validarAprendiz } = require("./validaciones/validaciones")
 
 //importar multer
-const multer =require("multer")
+const multer =require("multer");
+
+
 //almacenamiento
 const almacen = multer.diskStorage({
 
@@ -27,6 +35,9 @@ const subir = multer({storage: almacen})
 //middlewarc body-parse
 app.use(express.json())
 app.use(express.urlencoded({extended : true}))
+
+//usar nuestro middleware
+app.use(registroMiddleware)
 
 
 app.get('/', (req, res) => {
@@ -67,7 +78,6 @@ app.post('/api/aprendices', subir.single("imagen"), validarAprendiz, (req, res) 
   })
 });
 
-
 app.put('/api/aprendices/:id', (req, res) => {
 res.status(200).json({Mensaje:"actualiza aprendices"})
 });
@@ -75,6 +85,14 @@ res.status(200).json({Mensaje:"actualiza aprendices"})
 app.delete('/api/aprendices', (req, res) => {
 res.status(200).json({Mensaje:"eliminado"})
 });
+
+
+//provocando error
+app.get("/api/error", (req,res, next)=>{
+  next(new Error("Este es un error provocado"))
+})
+//Tiene que ir el Error abajo, para que funcione
+app.use(manejadorErrores)
 
 app.listen(port, () => {
 console.log( `Servidor en funcionamiento en el puerto: http://localhost:${port}`);
