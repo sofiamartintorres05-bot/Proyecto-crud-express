@@ -7,25 +7,26 @@ const sistemaArchivo = require("fs")
 const ruta = require("path")
 const rutaMiArchivo = ruta.join(__dirname,"datos.json")
 
+//importar validacion
+const { validarAprendiz } = require("./validaciones/validaciones")
 
 //importar multer
-const multer =require ("multer")
-//Almacenamiento
+const multer =require("multer")
+//almacenamiento
 const almacen = multer.diskStorage({
-    destination:(req,file,cb )=> {
-        cb(null,"misImagenes/")
-    },
-    filename : (rey,file,cb )=>{ 
-        const extension = ruta.extname(file.originalname)
-        cb(null,`${Date.now()}${extension}`)
-    }  /*cb= call back */
+
+  destination: (req, file, cb)=>{cb(null, "misImagenes/")},
+  filename: (req, file, cb)=>{
+    const extension = ruta.extname(file.originalname)
+    cb(null, `${Date.now()}${extension}`)
+  },
+
 })
+const subir = multer({storage: almacen})
 
-const subir = multer ({storage : almacen})
-
-//middlewarc formateo body
+//middlewarc body-parse
 app.use(express.json())
-app.use(express.urlencoded({extended :true}))
+app.use(express.urlencoded({extended : true}))
 
 
 app.get('/', (req, res) => {
@@ -41,22 +42,30 @@ app.get('/api/aprendices', (req, res) => {
 });
 
 
-app.post('/api/aprendices', subir.single("imagen"),(req, res) => {
-  const datosAprendiz = req.body
-  datosAprendiz.imagen = req.file?`/misImagenes/${req.file.filename}`:"Sin Imagen"
-
- sistemaArchivo.readFile(rutaMiArchivo, "utf-8", (error, Datos)=>{
+app.post('/api/aprendices', subir.single("imagen"), validarAprendiz, (req, res) => {
+  sistemaArchivo.readFile(rutaMiArchivo, "utf-8", (error, Datos)=>{
     if (error) res.status(500).json({error : "No se puede leer el archivo"})
     const listaAprendices = JSON.parse (Datos)
-  listaAprendices.push(datosAprendiz)
-  sistemaArchivo.writeFile(rutaMiArchivo, JSON.stringify(listaAprendices, null, 2), (error)=>{
-    if (error) res.status(500).json({error : "No se puede escribir en el archivo"})
+
+    // Generar el ID empezando desde 1
+    const nuevoId = listaAprendices.length > 0 
+      ? Number(listaAprendices[listaAprendices.length - 1].id || 0) + 1 
+      : 1;
+
+    const datosAprendiz = {
+      id: nuevoId,
+      ...req.body,
+      imagen: req.file ? `/misImagenes/${req.file.filename}` : "sin Imagen"
+    }
+
+    listaAprendices.push(datosAprendiz)
+    sistemaArchivo.writeFile(rutaMiArchivo, JSON.stringify(listaAprendices, null, 2), (error)=>{
+      if (error) res.status(500).json({error : "No se puede escribir en el archivo"})
       res.status(200).json({Mensaje : "Creado", Datos: datosAprendiz})
-  })
+    })
   
   })
 });
-
 
 
 app.put('/api/aprendices/:id', (req, res) => {
