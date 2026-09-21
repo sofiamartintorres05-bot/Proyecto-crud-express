@@ -1,12 +1,15 @@
 const { error } = require('console');
 const express = require('express');
+require('dotenv').config();
 const app = express();
-const port = process.env.MIPUERTO || 3003
+const port = process.env.MIPUERTO || 3003;
+const jwtojen = require ("jsonwebtoken")
 
 //Importar mis Middleware
 
-const registroMiddleware = require("./middleware/registroMiddleware")
-const manejadorErrores = require("./middleware/manejadorErrores")
+const registroMiddleware = require("./src/middleware/registroMiddleware")
+const manejadorErrores = require("./src/middleware/manejadorErrores")
+const autentificacionMiddleware = require("./src/middleware/autentificacionMiddeware");
 
 //libreria fs.path
 const sistemaArchivo = require("fs")
@@ -91,6 +94,35 @@ res.status(200).json({Mensaje:"eliminado"})
 app.get("/api/error", (req,res, next)=>{
   next(new Error("Este es un error provocado"))
 })
+
+//Ruta protegida, para acceder con token,permisos de usuario
+app.get("/api/rutaprotegida",autentificacionMiddleware, (req,res)=>{
+  res.json({Mensaje:"Ruta protegida, acceso con token"});
+});
+
+
+//endpoint a ruta de inicio de sesion para generar un token
+app.post("/api/login", (req, res) => {
+  //Capturar datos del usuario
+  const {usuario, clave}=req.body
+  //simular datos de usuario en la BD
+  const bdUsuario = {"usuario": "Shofia", "clave":"1234" }
+  //validar datos
+  if(usuario !==bdUsuario.usuario || clave !== bdUsuario.clave)
+  {
+    res.json({Mensaje: "Usuario y/o clave incorrecta!!" });
+  }
+  //Verificacion y generacion del token
+  const token = jwtojen.sign(
+    {"user": req.usuario},
+    process.env.JWT_SECRETO,
+    {expiresIn:"1h",
+    });
+    res.json({ token });
+    
+});
+
+
 //Tiene que ir el Error abajo, para que funcione
 app.use(manejadorErrores)
 
